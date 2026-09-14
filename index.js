@@ -7,15 +7,35 @@ const messageRoutes = require('./routes/messageRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const corsOrigins = (process.env.CORS_ORIGIN || "")
-  .split(",")
-  .map((origin) => origin.trim())
-  .filter(Boolean);
 
-app.use(cors({
-    origin: corsOrigins,
-    credentials: true
-  }));
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:3000",
+  "https://react-crud-client-chi.vercel.app",
+  "https://react-crud-client-84ygdc06g-team-learn2.vercel.app",
+  ...(process.env.CORS_ORIGIN || "")
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean),
+];
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin) || /\.vercel\.app$/.test(origin)) {
+      return callback(null, true);
+    }
+
+    return callback(new Error("Blocked by CORS"));
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
+
+app.use(cors(corsOptions));
+app.options(/.*/, cors(corsOptions));
 
 app.use(express.json());
 app.use('/api/messages',messageRoutes);
