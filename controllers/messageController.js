@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const Message = require('../models/Message');
+const Message = require('../models/message');
 
 const isValidId = (id) => mongoose.Types.ObjectId.isValid(id);
 
